@@ -3,8 +3,8 @@ import json
 
 with open("words_eng.json", "r", encoding="utf-8") as f1:
     words_eng = json.load(f1)
-with open("words_pol.json", "r", encoding="utf-8") as f2:
-    words_pol = json.load(f2)
+with open("words_pl.json", "r", encoding="utf-8") as f2:
+    words_pl = json.load(f2)
 
 
 class GamePlay:
@@ -17,7 +17,7 @@ class GamePlay:
         if language == "english":
             self.word_pool = words_eng.copy()
         elif language == "polish":
-            self.word_pool = words_pol.copy()
+            self.word_pool = words_pl.copy()
         else:
             raise ValueError("Unsupported language. Choose 'english' or 'polish'.")
 
