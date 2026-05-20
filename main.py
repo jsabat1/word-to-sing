@@ -7,7 +7,7 @@ from views.game import game_view
 from views.results import results_view
 
 
-async def main(page: ft.Page):
+def main(page: ft.Page):
     try:
         page.title = "Sing That Word"
         page.theme_mode = ft.ThemeMode.DARK
@@ -18,34 +18,25 @@ async def main(page: ft.Page):
 
         game = GamePlay()
 
-        async def route_change(e):
-            page.views.clear()
-            route = e.route if e and hasattr(e, "route") else "/"
+        # manual router, pierdoli sie ten nowy
+        def change_screen(screen_name):
+            page.clean()
 
-            if route == "/game":
-                page.views.append(game_view(page, game))
-            elif route == "/results":
-                page.views.append(results_view(page, game))
-            else:
-                page.views.append(lobby_view(page, game))
+            if screen_name == "lobby":
+                page.add(lobby_view(page, game, change_screen))
+            elif screen_name == "game":
+                page.add(game_view(page, game, change_screen))
+            elif screen_name == "results":
+                page.add(results_view(page, game, change_screen))
 
-            await page.update_async()
+            page.update()
 
-        async def view_pop(e):
-            page.views.pop()
-            top_view = page.views[-1]
-            await page.push_route(top_view.route)
-
-        page.on_route_change = route_change
-        page.on_view_pop = view_pop
-
-        await page.push_route("/")
+        change_screen("lobby")
 
     except Exception as e:
-        page.views.clear()
-        page.views.append(
-            ft.View(
-                "/",
+        page.clean()
+        page.add(
+            ft.Column(
                 [
                     ft.Text(
                         "APP CRASHED:",
@@ -57,10 +48,9 @@ async def main(page: ft.Page):
                     ft.Text("Check your terminal for the full error.", size=16),
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                vertical_alignment=ft.MainAxisAlignment.CENTER,
             )
         )
-        await page.update_async()
+        page.update()
         print("--- APP CRASHED ---")
         traceback.print_exc()
 

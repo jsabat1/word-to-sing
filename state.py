@@ -12,16 +12,26 @@ class GamePlay:
         self.players = {}
         self.word_pool = []
         self.current_word = None
+        self.current_lang = "english"
+        self.current_limit = "all"
 
-    def select_language(self, language):
-        if language == "english":
+    def select_language(self, language, limit="all"):
+        self.current_lang = language
+        self.current_limit = limit
+        if language not in ["english", "polish"]:
+            raise ValueError("Unsupported language.")
+        self.refill_pool()
+
+    def refill_pool(self):
+        if self.current_lang == "english":
             self.word_pool = words_eng.copy()
-        elif language == "polish":
+        elif self.current_lang == "polish":
             self.word_pool = words_pl.copy()
-        else:
-            raise ValueError("Unsupported language. Choose 'english' or 'polish'.")
 
         random.shuffle(self.word_pool)
+
+        if self.current_limit != "all":
+            self.word_pool = self.word_pool[: int(self.current_limit)]
 
     def add_player(self, player_name):
         if player_name and player_name not in self.players:
@@ -41,6 +51,7 @@ class GamePlay:
         for player in self.players:
             self.players[player] = 0
 
+        self.refill_pool()
         self.draw_next_word()
 
     def update_score(self, player_name):
