@@ -1,5 +1,6 @@
 import random
 import json
+import string
 
 with open("words_eng.json", "r", encoding="utf-8") as f1:
     words_eng = json.load(f1)
@@ -8,12 +9,16 @@ with open("words_pl.json", "r", encoding="utf-8") as f2:
 
 
 class GamePlay:
-    def __init__(self):
+    def __init__(self, room_code, host_session_id):
+        self.room_code = room_code
+        self.host_session_id = host_session_id
         self.players = {}
         self.word_pool = []
         self.current_word = None
         self.current_lang = "english"
         self.current_limit = "all"
+        self.is_locked = False
+        self.buzzed_player = None
 
     def select_language(self, language, limit="all"):
         self.current_lang = language
@@ -50,10 +55,9 @@ class GamePlay:
     def new_game(self):
         for player in self.players:
             self.players[player] = 0
-
         self.refill_pool()
         self.draw_next_word()
 
-    def update_score(self, player_name):
+    def update_score(self, player_name, points):
         if player_name in self.players:
-            self.players[player_name] += 1
+            self.players[player_name] += points
